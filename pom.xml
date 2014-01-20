@@ -4,9 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>Web106-deploy</groupId>
-    <artifactId>Web106-deploy</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>web106</groupId>
+    <artifactId>web106</artifactId>
+    <version>1.0</version> 
+    <packaging>war</packaging>
+ 
 
     <build>
         <plugins>
@@ -14,6 +16,17 @@
                 <groupId>br.com.ingenieux</groupId>
                 <artifactId>beanstalk-maven-plugin</artifactId>
                 <version>1.1.1</version>
+		<configuration>
+        		<accessKey>AWS_ACCESS_KEY</accessKey>
+        		<secretKey>AWS_SECRET_KEY</secretKey>
+			<s3Bucket>web106eb</s3Bucket>
+			<cnamePrefix>web107</cnamePrefix>
+			<environmentName>web107-env</environmentName>
+			<region>eu-west-1</region>
+			<sourceDirectory>${project.build.directory}</sourceDirectory>
+
+      		</configuration>
+
             </plugin>
         </plugins>
     </build>
