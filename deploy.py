@@ -11,6 +11,7 @@ class Deploy:
     dbUserPassword = "web106db"
     dbEndpoint = None
     bucketKey = None
+    bucketUrl = None
 
     def __init__(self):
         date = datetime.datetime.now()
@@ -21,8 +22,7 @@ class Deploy:
         #self.createWarFile()
         #self.uploadWarFile()
         self.createDbRds()
-        print self.dbEndpoint
-        print self.bucketKey
+       
     
     def checkoutProjectFromGit(self):
         print "checkout"
@@ -48,14 +48,14 @@ class Deploy:
         else:
             bucket = connS3.get_bucket(self.bucketName)
             print "bucket already exists"
-            
-        
+               
         k = Key(bucket)
         k.key = self.fileName
         print "uploading..."
         k.set_contents_from_filename(self.fileName)
         
         self.bucketKey = k.key
+        self.bucketUrl = k.generate_url(expires_in=0, query_auth=False)
         
         print "done uploading war file"
         
