@@ -75,6 +75,7 @@ public class Common {
             BufferedInputStream stream = new BufferedInputStream(new FileInputStream("aws.properties"));
             properties.load(stream);
             stream.close();
+            System.out.println("check aws.properties file");
 
         } catch (FileNotFoundException e) {
             System.out.println("cant find aws.properties file");

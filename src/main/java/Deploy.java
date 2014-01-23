@@ -21,7 +21,6 @@ public class Deploy {
     private static String userPassword = null;
     private static int Gb = 5;
     private static String securityGroupName = null;
-    private static String instanceClass = "db.t1.micro";//db.m1.medium;
     private static String bucketName = null;
     private static String databaseEndpoint = "";
     private static String applicationName = null;
@@ -58,7 +57,6 @@ public class Deploy {
 
                 try {
                     //Start deployment steps
-                    deploymentIsFine = false;
                     if (deploymentIsFine) {
                         deploymentIsFine = common.checkAwsProperties();
                         if (deploymentIsFine) {
@@ -104,7 +102,7 @@ public class Deploy {
                         if (rds.dbexists(databaseName)) {
                             System.out.println("DB already exists");
                         } else {
-                            deploymentIsFine = rds.createRdsDatabase(databaseName, userName, userPassword, Gb, securityGroupName, instanceClass);
+                            deploymentIsFine = rds.createRdsDatabase(databaseName, userName, userPassword, Gb, securityGroupName, setting);
                         }
                     }
 

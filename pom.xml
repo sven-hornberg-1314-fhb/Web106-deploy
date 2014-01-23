@@ -6,7 +6,7 @@
 
     <groupId>deploy</groupId>
     <artifactId>deploy</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
     <properties>
         <jdk.version>1.7</jdk.version>
@@ -42,6 +42,7 @@
                             <mainClass>Deploy</mainClass>
                         </manifest>
                     </archive>
+                    <finalName>deploy.jar</finalName>
                 </configuration>
             </plugin>
 

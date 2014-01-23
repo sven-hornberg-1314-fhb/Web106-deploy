@@ -22,6 +22,8 @@ import java.util.List;
 public class Rds {
 
     AWSCredentials awsCredentials;
+    private static String instanceClassMicro = "db.t1.micro";//db.m1.medium;
+    private static String instanceClassMedium ="db.m1.medium";
 
     public Rds(AWSCredentials aws) {
         awsCredentials = aws;
@@ -51,7 +53,7 @@ public class Rds {
         return returnVal;
     }
 
-    public boolean createRdsDatabase(String databaseName, String userName, String userPassword, int Gb, String securityGroupName, String instanceClass) {
+    public boolean createRdsDatabase(String databaseName, String userName, String userPassword, int Gb, String securityGroupName, Deploy.settings setting) {
 
         try {
 
@@ -84,13 +86,18 @@ public class Rds {
                 createDBInstanceRequest
                         .withDBName("ebdb")
                         .withAllocatedStorage(5)
-                        .withDBInstanceClass("db.t1.micro")
                         .withEngine("mysql")
                         .withMasterUsername("web106db")
                         .withMasterUserPassword("web106db")
                         .withDBInstanceIdentifier("ebdb")
                         .withMultiAZ(false)
                         .withVpcSecurityGroupIds(ids);
+
+                if(setting.equals(Deploy.settings.LOWCOST)) {
+                    createDBInstanceRequest.withDBInstanceClass(instanceClassMicro);
+                } else {
+                    createDBInstanceRequest.withDBInstanceClass(instanceClassMedium);
+                }
 
                 amazonRDSClient.createDBInstance(createDBInstanceRequest);
                 System.out.println("creating DB");

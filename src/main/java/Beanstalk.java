@@ -143,7 +143,7 @@ public class Beanstalk {
             if (setting.equals(Deploy.settings.LOWCOST)) {
                 configurationOptionSettings = createLowcostSettings(awsAccessKey, awsSecretKey, JDBC_CONNECTION_STRING, dbUser, dbUserPassword);
             } else {
-                configurationOptionSettings = new ArrayList<ConfigurationOptionSetting>();
+                configurationOptionSettings = createStandardSettings(awsAccessKey, awsSecretKey, JDBC_CONNECTION_STRING, dbUser, dbUserPassword);
             }
             createEnvironmentRequest.setOptionSettings(configurationOptionSettings);
 
@@ -188,15 +188,15 @@ public class Beanstalk {
 
         configurationOptionSetting = new ConfigurationOptionSetting();
         configurationOptionSetting.setNamespace("aws:elasticbeanstalk:container:tomcat:jvmoptions");
-        configurationOptionSetting.setOptionName("256m");
-        configurationOptionSetting.setValue(JDBC_CONNECTION_STRING);
+        configurationOptionSetting.setOptionName("Xms");
+        configurationOptionSetting.setValue("256m");
         configurationOptionSettings.add(configurationOptionSetting);
 
 
         configurationOptionSetting = new ConfigurationOptionSetting();
         configurationOptionSetting.setNamespace("aws:elasticbeanstalk:container:tomcat:jvmoptions");
-        configurationOptionSetting.setOptionName("256m");
-        configurationOptionSetting.setValue(dbUser);
+        configurationOptionSetting.setOptionName("Xmx");
+        configurationOptionSetting.setValue("256m");
         configurationOptionSettings.add(configurationOptionSetting);
 
         configurationOptionSetting = new ConfigurationOptionSetting();
@@ -207,12 +207,76 @@ public class Beanstalk {
         return configurationOptionSettings;
     }
 
-    public List<ConfigurationOptionSetting> createStandardSettings() {
+    public List<ConfigurationOptionSetting> createStandardSettings(String awsAccessKey, String awsSecretKey, String JDBC_CONNECTION_STRING, String dbUser, String dbUserPassword) {
         List<ConfigurationOptionSetting> configurationOptionSettings = new ArrayList<ConfigurationOptionSetting>();
+        ConfigurationOptionSetting configurationOptionSetting = new ConfigurationOptionSetting();
+        configurationOptionSetting.setNamespace("aws:elasticbeanstalk:application:environment");
+        configurationOptionSetting.setOptionName("AWS_SECRET_KEY");
+        configurationOptionSetting.setValue(awsSecretKey);
+        configurationOptionSettings.add(configurationOptionSetting);
 
-        //m1.medium /RAM 3,75
+        configurationOptionSetting = new ConfigurationOptionSetting();
+        configurationOptionSetting.setNamespace("aws:elasticbeanstalk:application:environment");
+        configurationOptionSetting.setOptionName("AWS_ACCESS_KEY_ID");
+        configurationOptionSetting.setValue(awsAccessKey);
+        configurationOptionSettings.add(configurationOptionSetting);
+
+        configurationOptionSetting = new ConfigurationOptionSetting();
+        configurationOptionSetting.setNamespace("aws:elasticbeanstalk:application:environment");
+        configurationOptionSetting.setOptionName("JDBC_CONNECTION_STRING");
+        configurationOptionSetting.setValue(JDBC_CONNECTION_STRING);
+        configurationOptionSettings.add(configurationOptionSetting);
+
+
+        configurationOptionSetting = new ConfigurationOptionSetting();
+        configurationOptionSetting.setNamespace("aws:elasticbeanstalk:application:environment");
+        configurationOptionSetting.setOptionName("PARAM1");
+        configurationOptionSetting.setValue(dbUser);
+        configurationOptionSettings.add(configurationOptionSetting);
+
+        configurationOptionSetting = new ConfigurationOptionSetting();
+        configurationOptionSetting.setNamespace("aws:elasticbeanstalk:application:environment");
+        configurationOptionSetting.setOptionName("PARAM2");
+        configurationOptionSetting.setValue(dbUserPassword);
+        configurationOptionSettings.add(configurationOptionSetting);
+
+        configurationOptionSetting = new ConfigurationOptionSetting();
+        configurationOptionSetting.setNamespace("aws:elasticbeanstalk:container:tomcat:jvmoptions");
+        configurationOptionSetting.setOptionName("Xms");
+        configurationOptionSetting.setValue("512m");
+        configurationOptionSettings.add(configurationOptionSetting);
+
+
+        configurationOptionSetting = new ConfigurationOptionSetting();
+        configurationOptionSetting.setNamespace("aws:elasticbeanstalk:container:tomcat:jvmoptions");
+        configurationOptionSetting.setOptionName("Xmx");
+        configurationOptionSetting.setValue("512m");
+        configurationOptionSettings.add(configurationOptionSetting);
+
+
+        configurationOptionSetting = new ConfigurationOptionSetting();
+        configurationOptionSetting.setNamespace("aws:elasticbeanstalk:container:tomcat:jvmoptions");
+        configurationOptionSetting.setOptionName("XX:MAXPermSize");
+        configurationOptionSetting.setValue("2048m");
+        configurationOptionSettings.add(configurationOptionSetting);
+
+
+        configurationOptionSetting = new ConfigurationOptionSetting();
+        configurationOptionSetting.setNamespace("aws:autoscaling:asg");
+        configurationOptionSetting.setOptionName("MaxSize");
+        configurationOptionSetting.setValue("10");
+        configurationOptionSettings.add(configurationOptionSetting);
+
+
+        configurationOptionSetting = new ConfigurationOptionSetting();
+        configurationOptionSetting.setNamespace("aws:autoscaling:asg");
+        configurationOptionSetting.setOptionName("InstanceType");
+        configurationOptionSetting.setValue("m1.medium");
+        configurationOptionSettings.add(configurationOptionSetting);
 
         return configurationOptionSettings;
+
+
     }
 
     public String ApplicationUrl(String versionLabel) {
@@ -258,18 +322,9 @@ public class Beanstalk {
         return true;
     }
     /*
-     #tg1 = generalContainer, 'MaxSize', '4'
-        #tg2 = generalContainer, 'InstanceType','t1.micro'
-
-
-
-        tj1 = self.javaContainer, 'Xms', '256m'
-        tj2 = self.javaContainer, 'Xmx', '256m'
-        tj3 = self.javaContainer, 'XX:MAXPermSize', '512m'
-
-        bsContainer = "aws:elasticbeanstalk:application:environment"
+    bsContainer = "aws:elasticbeanstalk:application:environment"
     javaContainer = "aws:elasticbeanstalk:container:tomcat:jvmoptions"
     generalContainer = 'aws:autoscaling:asg'
-     */
+    */
 
 }
