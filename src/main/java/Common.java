@@ -29,8 +29,8 @@ public class Common {
 
         System.out.println("creating war file");
 
-        URL location = Common.class.getProtectionDomain().getCodeSource().getLocation();
-        System.out.println(location.getFile());
+        //URL location = Common.class.getProtectionDomain().getCodeSource().getLocation();
+        //System.out.println(location.getFile());
 
         try {
             Runtime rt = Runtime.getRuntime();
@@ -46,8 +46,10 @@ public class Common {
             System.out.println(fileName + " created");
         } catch (IOException ex) {
             System.out.println("cant execute grailwrapper");
+            return false;
         } catch (InterruptedException e) {
             System.out.println("error during execution of grailwrapper");
+            return false;
         }
 
         return true;
@@ -118,6 +120,11 @@ public class Common {
             e.printStackTrace();
         }
         return true;
+    }
+
+    public boolean WarFileIsReady(String fileName){
+        File file = new File(fileName);
+        return file.exists();
     }
 
 

@@ -68,6 +68,7 @@ public class Deploy {
                         }
                     }
 
+
                     if (deploymentIsFine) {
                         deploymentIsFine = common.checkGrailsWrapper();
                         if (deploymentIsFine) {
@@ -79,7 +80,6 @@ public class Deploy {
                         deploymentIsFine = common.createAwsCredentialsFile(awsAccessKey, awsSecretKey);
                     }
 
-                    common.deleteAwsCredentialsFile();
 
                     if (deploymentIsFine) {
                         Beanstalk beanstalk = new Beanstalk(awsCredentials);
@@ -107,6 +107,16 @@ public class Deploy {
                     }
 
                     if (deploymentIsFine) {
+
+                        while(!common.WarFileIsReady(fileName)) {
+                            System.out.println("waiting for warfile");
+                            try {
+                                Thread.sleep(30000);
+                            } catch (InterruptedException ex) {
+                                break;
+                            }
+                        }
+
                         if (common.checkWarFileCalcSize(fileName)) {
                             S3 s3 = new S3(awsCredentials);
                             deploymentIsFine = s3.checkAndCreateBucket(bucketName);
@@ -117,7 +127,7 @@ public class Deploy {
                                     String MD5BucketFile = s3.MD5OfFileInBucket(bucketName, fileName);
                                     String MD5LocalFile = s3.MD5ofFile(warFile);
 
-                                    if (MD5BucketFile.equals(MD5LocalFile)) {
+                                    if (null != MD5BucketFile && MD5BucketFile.equals(MD5LocalFile)) {
                                         System.out.println("skipping upload, file has the same hash");
                                     } else {
                                         deploymentIsFine = s3.uploadWarfile(bucketName, warFile);
@@ -126,6 +136,7 @@ public class Deploy {
                             }
                         }
                     }
+                    common.deleteAwsCredentialsFile();
 
                     if (deploymentIsFine) {
                         Beanstalk beanstalk = new Beanstalk(awsCredentials);
