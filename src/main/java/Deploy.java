@@ -3,39 +3,37 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import org.joda.time.DateTime;
 
-import java.io.File;
+import java.io.*;
+import java.util.Properties;
 
 
 public class Deploy {
 
-    private static String awsAccessKey = "";
-    private static String awsSecretKey = "";
+    private static String awsAccessKey = null;
+    private static String awsSecretKey = null;
     private static boolean deploymentIsFine = true;
-    private static String fileName = "web106.war";
+    private static String fileName = null;
     private static AWSCredentials awsCredentials;
-    private static String groupName = "web106beanstalk";
+    private static String groupName = null;
 
-    private static String databaseName = "ebdb";
-    private static String userName = "web106db";
-    private static String userPassword = "web106db";
+    private static String databaseName = null;
+    private static String userName = null;
+    private static String userPassword = null;
     private static int Gb = 5;
-    private static String securityGroupName = "web106beanstalk";
-    private static String instanceClass = "db.t1.micro";
-    private static String bucketName = "web106eb";
+    private static String securityGroupName = null;
+    private static String instanceClass = "db.t1.micro";//db.m1.medium;
+    private static String bucketName = null;
     private static String databaseEndpoint = "";
-    private static String applicationName = "web106";
-    private static String applicationLabel = "Web106prod";
-    private static String applicationTemaplate = "TWeb106";
+    private static String applicationName = null;
+    private static String applicationLabel = null;
+    private static String applicationTemaplate = null;
+
 
     public enum settings {LOWCOST, STANDARD}
 
     private static settings setting;
 
-    /**
-     * -mod lowcost , -mod bench
-     *
-     * @param args
-     */
+
     public static void main(String args[]) {
 
         Common common = new Common();
@@ -47,7 +45,7 @@ public class Deploy {
         }
 
         if (deploymentIsFine) {
-            System.out.println("Begin deploy at " + DateTime.now().toLocalTime());
+            System.out.println("Start at " + DateTime.now().toLocalTime());
 
 
             if (args[0].contains("-deploy")) {
@@ -64,8 +62,11 @@ public class Deploy {
                     if (deploymentIsFine) {
                         deploymentIsFine = common.checkAwsProperties();
                         if (deploymentIsFine) {
-                            common.fillVaiablesFromProperties();
-                            awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
+                            deploymentIsFine = fillVaiablesFromProperties();
+                            if(deploymentIsFine){
+                                awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
+                                deploymentIsFine= testAWSCredentials();
+                            }
                         }
                     }
 
@@ -90,10 +91,6 @@ public class Deploy {
                         }
                     }
 
-                    //todo delete
-                    awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
-
-                    deploymentIsFine = true;
                     if (deploymentIsFine) {
                         Security security = new Security(awsCredentials);
                         deploymentIsFine = security.checkSecurityGroupForMySQL(groupName);
@@ -176,26 +173,100 @@ public class Deploy {
                 }
             } else if (args[0].contains("-terminate")) {
                 try {
-                    awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
+                    deploymentIsFine = common.checkAwsProperties();
+                    if (deploymentIsFine) {
+                        deploymentIsFine =fillVaiablesFromProperties();
+                        if (deploymentIsFine) {
+
+                            deploymentIsFine =fillVaiablesFromProperties();
+
+                            if(deploymentIsFine) {
+                                awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
+                                deploymentIsFine= testAWSCredentials();
+                            }
+                        }
+                    }
+
+                    if(deploymentIsFine) {
+
+                        Beanstalk beanstalk = new Beanstalk(awsCredentials);
+                        beanstalk.deleteApplication(applicationName);
+
+                        Rds rds = new Rds(awsCredentials);
+                        rds.deleteRds(databaseName);
+
+                        System.out.println("Done");
+                    }
+                    } catch (Exception ex) {
+
+                        System.out.println("unexpected error:");
+                        System.out.println(ex.getMessage());
 
 
-                    Beanstalk beanstalk = new Beanstalk(awsCredentials);
-                    beanstalk.deleteApplication(applicationName);
-
-                    Rds rds = new Rds(awsCredentials);
-                    rds.deleteRds(databaseName);
-                } catch (Exception ex) {
-
-                    System.out.println("unexpected error:");
-                    System.out.println(ex.getMessage());
-
-
-                }
+                    }
             } else {
                 System.out.println("unknown parameter");
             }
         }
     }
 
+    public static boolean fillVaiablesFromProperties() {
+
+        boolean returnVal = true;
+
+        try {
+
+            Properties properties = new Properties();
+            BufferedInputStream stream = new BufferedInputStream(new FileInputStream("aws.properties"));
+            properties.load(stream);
+            stream.close();
+
+            awsAccessKey = properties.getProperty("awsAccessKey");
+            awsSecretKey = properties.getProperty("awsSecretKey");
+
+            bucketName = properties.getProperty("bucketName");
+            fileName = properties.getProperty("fileName");
+            applicationName = properties.getProperty("applicationName");
+            applicationLabel = properties.getProperty("label");
+
+            userName = properties.getProperty("dbUser");
+            userPassword = properties.getProperty("dbUserPassword");
+            databaseName = properties.getProperty("dbName");
+
+            applicationTemaplate = properties.getProperty("templateName");
+            groupName =properties.getProperty("ec2SecurityGroup");
+
+
+            if(awsAccessKey == null || awsSecretKey == null || bucketName == null
+                    || fileName == null || applicationName == null || applicationLabel == null ||
+                    userName == null || userPassword == null || databaseName == null ||
+                    applicationTemaplate == null || groupName == null) {
+                System.out.println("please check our aws.properties file , some information are missing");
+                returnVal = false;
+            }
+
+        } catch (FileNotFoundException e) {
+            System.out.println("cant find aws.properties file");
+            returnVal = false;
+
+        } catch (IOException e) {
+            System.out.println("IO Error");
+            returnVal = false;
+        }
+        return returnVal;
+    }
+
+    public static boolean testAWSCredentials() {
+
+        try {
+            Beanstalk beanstalk = new Beanstalk(awsCredentials);
+            beanstalk.checkDNSAvailability("Test");
+
+        }catch (Exception ex) {
+            System.out.println("Your aws keys do not work");
+            return false;
+        }
+        return  true;
+    }
 
 }

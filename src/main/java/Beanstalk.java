@@ -239,10 +239,22 @@ public class Beanstalk {
         Region region = Region.getRegion(Regions.EU_WEST_1);
         awsElasticBeanstalk.setRegion(region);
 
-        TerminateEnvironmentRequest terminateEnvironmentRequest = new TerminateEnvironmentRequest();
-        terminateEnvironmentRequest.setEnvironmentName(applicationName + "env");
-        awsElasticBeanstalk.terminateEnvironment(terminateEnvironmentRequest);
-        System.out.println("terminate " + applicationName);
+            String tempName = applicationName+"env";
+        boolean exists = false;
+        List<EnvironmentDescription> environmentDescriptions = awsElasticBeanstalk.describeEnvironments().getEnvironments();
+
+        for (EnvironmentDescription environmentDescription : environmentDescriptions) {
+            if (tempName.equals(environmentDescription.getEnvironmentName())) {
+                exists = true;
+            }
+        }
+        if(exists) {
+
+            TerminateEnvironmentRequest terminateEnvironmentRequest = new TerminateEnvironmentRequest();
+            terminateEnvironmentRequest.setEnvironmentName(applicationName + "env");
+            awsElasticBeanstalk.terminateEnvironment(terminateEnvironmentRequest);
+            System.out.println("terminate " + applicationName);
+        }
         return true;
     }
     /*

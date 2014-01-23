@@ -76,10 +76,6 @@ public class Common {
             properties.load(stream);
             stream.close();
 
-
-            String sprache = properties.getProperty("dbUser");
-            System.out.println(sprache);
-
         } catch (FileNotFoundException e) {
             System.out.println("cant find aws.properties file");
             return false;
@@ -123,7 +119,5 @@ public class Common {
         return true;
     }
 
-    public boolean fillVaiablesFromProperties() {
-        return true;
-    }
+
 }

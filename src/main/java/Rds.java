@@ -123,17 +123,22 @@ public class Rds {
     }
 
     public boolean deleteRds(String databaseName) {
-        Region region = Region.getRegion(Regions.EU_WEST_1);
 
-        AmazonRDS amazonRDSClient = new AmazonRDSClient(awsCredentials);
-        amazonRDSClient.setRegion(region);
+        if(dbexists(databaseName)) {
 
-        DeleteDBInstanceRequest deleteDBInstanceRequest = new DeleteDBInstanceRequest();
-        deleteDBInstanceRequest.setDBInstanceIdentifier(databaseName);
-        deleteDBInstanceRequest.setSkipFinalSnapshot(true);
+            Region region = Region.getRegion(Regions.EU_WEST_1);
 
-        amazonRDSClient.deleteDBInstance(deleteDBInstanceRequest);
-        System.out.println("deleting database");
+            AmazonRDS amazonRDSClient = new AmazonRDSClient(awsCredentials);
+            amazonRDSClient.setRegion(region);
+
+
+            DeleteDBInstanceRequest deleteDBInstanceRequest = new DeleteDBInstanceRequest();
+            deleteDBInstanceRequest.setDBInstanceIdentifier(databaseName);
+            deleteDBInstanceRequest.setSkipFinalSnapshot(true);
+
+            amazonRDSClient.deleteDBInstance(deleteDBInstanceRequest);
+            System.out.println("deleting database");
+        }
         return true;
 
     }
