@@ -35,4 +35,4 @@ terminate all
 
 * Java 1.7 with working classpath
 * Maven with working classpath
-* The grails wrapper should be able to perform <strong>grailsw pro war</strong>
+* The grails wrapper should be able to perform <strong>grailsw prod war</strong>
