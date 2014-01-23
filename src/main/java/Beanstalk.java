@@ -260,16 +260,8 @@ public class Beanstalk {
         configurationOptionSetting.setValue("2048m");
         configurationOptionSettings.add(configurationOptionSetting);
 
-
         configurationOptionSetting = new ConfigurationOptionSetting();
-        configurationOptionSetting.setNamespace("aws:autoscaling:asg");
-        configurationOptionSetting.setOptionName("MaxSize");
-        configurationOptionSetting.setValue("10");
-        configurationOptionSettings.add(configurationOptionSetting);
-
-
-        configurationOptionSetting = new ConfigurationOptionSetting();
-        configurationOptionSetting.setNamespace("aws:autoscaling:asg");
+        configurationOptionSetting.setNamespace("aws:autoscaling:launchconfiguration");
         configurationOptionSetting.setOptionName("InstanceType");
         configurationOptionSetting.setValue("m1.medium");
         configurationOptionSettings.add(configurationOptionSetting);
