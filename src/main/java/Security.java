@@ -72,6 +72,17 @@ public class Security {
             AmazonEC2 amazonEC2 = new AmazonEC2Client(awsCredentials);
             amazonEC2.setRegion(region);
 
+            DescribeSecurityGroupsResult describeSecurityGroupsResult = amazonEC2.describeSecurityGroups();
+            List<SecurityGroup> securityGroups = describeSecurityGroupsResult.getSecurityGroups();
+
+            SecurityGroup web106ec2 = null;
+            for (SecurityGroup securityGroup : securityGroups) {
+                if (securityGroup.getGroupName().equals(groupName)) {
+                    web106ec2 = securityGroup;
+                    System.out.println("Securitygroup ok");
+                }
+            }
+
             String ipAddr = "0.0.0.0/0";
             ArrayList<String> ipRanges = new ArrayList<String>();
             ipRanges.add(ipAddr);
@@ -86,12 +97,12 @@ public class Security {
 
             // Authorize the ports to the used.
             AuthorizeSecurityGroupIngressRequest ingressRequest = new AuthorizeSecurityGroupIngressRequest()
-                    .withGroupName(groupName).withIpPermissions(ipPermissions);
+                    .withGroupId(web106ec2.getGroupId()).withIpPermissions(ipPermissions);
 
             amazonEC2.authorizeSecurityGroupIngress(ingressRequest);
         } catch (AmazonServiceException aEx) {
 
-            if (aEx.getMessage().contains("InvalidPermission.Duplicate")) {
+            if (aEx.getErrorCode().contains("InvalidPermission.Duplicate")) {
 
                 System.out.println("MySQL-Port: ok");
             } else {
