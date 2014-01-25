@@ -53,7 +53,7 @@ public class Rds {
         return returnVal;
     }
 
-    public boolean createRdsDatabase(String databaseName, String userName, String userPassword, int Gb, String securityGroupName, Deploy.settings setting) {
+    public boolean createRdsDatabase(String databaseName, String userName, String userPassword, int Gb, String securityGroupName, Deploy.settings setting, boolean vpc) {
 
         try {
 
@@ -84,14 +84,16 @@ public class Rds {
 
                 CreateDBInstanceRequest createDBInstanceRequest = new CreateDBInstanceRequest();
                 createDBInstanceRequest
-                        .withDBName("ebdb")
+                        .withDBName(databaseName)
                         .withAllocatedStorage(5)
                         .withEngine("mysql")
-                        .withMasterUsername("web106db")
-                        .withMasterUserPassword("web106db")
-                        .withDBInstanceIdentifier("ebdb")
-                        .withMultiAZ(false)
-                        .withVpcSecurityGroupIds(ids);
+                        .withMasterUsername(userName)
+                        .withMasterUserPassword(userPassword)
+                        .withDBInstanceIdentifier(databaseName)
+                        .withMultiAZ(false);
+                if(vpc) {
+                    createDBInstanceRequest.withVpcSecurityGroupIds(ids);
+                }
 
                 if(setting.equals(Deploy.settings.LOWCOST)) {
                     createDBInstanceRequest.withDBInstanceClass(instanceClassMicro);
@@ -106,7 +108,11 @@ public class Rds {
             }
         } catch (Exception ex) {
 
-            System.out.println(ex.getMessage());
+            if(ex.getMessage().toLowerCase().contains("DBInstanceAlreadyExists")) {
+                System.out.println("DBInstance already exists");
+            } else {
+                System.out.println(ex.getMessage());
+            }
 
         }
         return true;
