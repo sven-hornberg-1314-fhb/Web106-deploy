@@ -4,14 +4,12 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.DescribeSecurityGroupsRequest;
 import com.amazonaws.services.ec2.model.DescribeSecurityGroupsResult;
 import com.amazonaws.services.ec2.model.SecurityGroup;
 import com.amazonaws.services.rds.AmazonRDS;
 import com.amazonaws.services.rds.AmazonRDSClient;
-import com.amazonaws.services.rds.model.CreateDBInstanceRequest;
-import com.amazonaws.services.rds.model.DBInstance;
-import com.amazonaws.services.rds.model.DeleteDBInstanceRequest;
-import com.amazonaws.services.rds.model.DescribeDBInstancesResult;
+import com.amazonaws.services.rds.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,54 +63,95 @@ public class Rds {
             AmazonEC2 amazonEC2 = new AmazonEC2Client(awsCredentials);
             amazonEC2.setRegion(region);
 
+            if(vpc) {
 
-            DescribeSecurityGroupsResult describeSecurityGroupsResult = amazonEC2.describeSecurityGroups();
-            List<SecurityGroup> securityGroups = describeSecurityGroupsResult.getSecurityGroups();
+                DescribeSecurityGroupsResult describeSecurityGroupsResult = amazonEC2.describeSecurityGroups();
+                List<SecurityGroup> securityGroups = describeSecurityGroupsResult.getSecurityGroups();
 
-            SecurityGroup web106ec2 = null;
-            for (SecurityGroup securityGroup : securityGroups) {
-                if (securityGroup.getGroupName().equals(securityGroupName)) {
-                    web106ec2 = securityGroup;
-                }
-            }
-
-            if (web106ec2 != null) {
-
-                List<String> ids = new ArrayList<String>();
-
-                ids.add(web106ec2.getGroupId());
-
-                CreateDBInstanceRequest createDBInstanceRequest = new CreateDBInstanceRequest();
-                createDBInstanceRequest
-                        .withDBName(databaseName)
-                        .withAllocatedStorage(5)
-                        .withEngine("mysql")
-                        .withMasterUsername(userName)
-                        .withMasterUserPassword(userPassword)
-                        .withDBInstanceIdentifier(databaseName)
-                        .withMultiAZ(false);
-                if(vpc) {
-                    createDBInstanceRequest.withVpcSecurityGroupIds(ids);
-                } else {
-                    
-                    createDBInstanceRequest.withDBSecurityGroups(ids);
+                SecurityGroup web106ec2 = null;
+                for (SecurityGroup securityGroup : securityGroups) {
+                    if (securityGroup.getGroupName().equals(securityGroupName)) {
+                        web106ec2 = securityGroup;
+                    }
                 }
 
-                if(setting.equals(Deploy.settings.LOWCOST)) {
-                    createDBInstanceRequest.withDBInstanceClass(instanceClassMicro);
-                } else {
-                    createDBInstanceRequest.withDBInstanceClass(instanceClassMedium);
-                }
 
-                amazonRDSClient.createDBInstance(createDBInstanceRequest);
-                System.out.println("creating DB");
+                if (web106ec2 != null) {
+
+                    List<String> ids = new ArrayList<String>();
+
+                    ids.add(web106ec2.getGroupId());
+
+                    CreateDBInstanceRequest createDBInstanceRequest = new CreateDBInstanceRequest();
+                    createDBInstanceRequest
+                            .withDBName(databaseName)
+                            .withAllocatedStorage(5)
+                            .withEngine("mysql")
+                            .withMasterUsername(userName)
+                            .withMasterUserPassword(userPassword)
+                            .withDBInstanceIdentifier(databaseName)
+                            .withMultiAZ(false);
+
+                        createDBInstanceRequest.withVpcSecurityGroupIds(ids);
+
+                    if(setting.equals(Deploy.settings.LOWCOST)) {
+                        createDBInstanceRequest.withDBInstanceClass(instanceClassMicro);
+                    } else {
+                        createDBInstanceRequest.withDBInstanceClass(instanceClassMedium);
+                    }
+
+                    amazonRDSClient.createDBInstance(createDBInstanceRequest);
+                }
             } else {
-                System.out.println("cant find securitygroup");
+
+                DBSecurityGroup group = null;
+                List<DBSecurityGroup> dbSecurityGroups= amazonRDSClient.describeDBSecurityGroups().getDBSecurityGroups();
+                for (DBSecurityGroup securityGroup : dbSecurityGroups) {
+                    if (securityGroup.getDBSecurityGroupName().equals(securityGroupName)) {
+                        group = securityGroup;
+                    }
+                }
+
+                if(group != null) {
+
+                    List<String> ids = new ArrayList<String>();
+
+                    ids.add(group.getDBSecurityGroupName());
+
+                    CreateDBInstanceRequest createDBInstanceRequest = new CreateDBInstanceRequest();
+                    createDBInstanceRequest
+                            .withDBName(databaseName)
+                            .withAllocatedStorage(5)
+                            .withEngine("mysql")
+                            .withMasterUsername(userName)
+                            .withMasterUserPassword(userPassword)
+                            .withDBInstanceIdentifier(databaseName)
+                            .withMultiAZ(false);
+
+
+
+                    createDBInstanceRequest.setDBSecurityGroups(ids);
+
+                    if(setting.equals(Deploy.settings.LOWCOST)) {
+                        createDBInstanceRequest.withDBInstanceClass(instanceClassMicro);
+                    } else {
+                        createDBInstanceRequest.withDBInstanceClass(instanceClassMedium);
+                    }
+
+                    amazonRDSClient.createDBInstance(createDBInstanceRequest);
+
+                }
+
             }
+            System.out.println("creating DB");
+
         } catch (Exception ex) {
 
             if(ex.getMessage().toLowerCase().contains("DBInstanceAlreadyExists")) {
                 System.out.println("DBInstance already exists");
+            } else if(ex.getMessage().toLowerCase().contains("GroupNotFound")) {
+                System.out.println("Group not found");
+                return false;
             } else {
                 System.out.println(ex.getMessage());
             }
