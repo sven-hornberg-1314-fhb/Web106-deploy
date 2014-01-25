@@ -23,7 +23,7 @@ public class Security {
         awsCredentials = aws;
     }
 
-    public boolean checkSecurityGroupForMySQL(String groupName) {
+    public boolean checkSecurityGroupForMySQL(String groupName, boolean vpc) {
 
         Region region = Region.getRegion(Regions.EU_WEST_1);
 
@@ -46,7 +46,7 @@ public class Security {
 
             DescribeVpcsResult describeVpcsResult = amazonEC2.describeVpcs();
             List<Vpc> vpcs = describeVpcsResult.getVpcs();
-            if (vpcs.size() == 0) {
+            if (vpcs.size() == 0 || vpc) {
                 System.out.println("Please set at least one VPC before deploying");
                 return false;
             } else {
@@ -54,7 +54,11 @@ public class Security {
                 CreateSecurityGroupRequest createSecurityGroupRequest = new CreateSecurityGroupRequest();
                 createSecurityGroupRequest.setGroupName(groupName);
                 createSecurityGroupRequest.setDescription("deployed group");
-                createSecurityGroupRequest.setVpcId(vpcs.get(0).getVpcId());
+
+                if(vpc) {
+                    createSecurityGroupRequest.setVpcId(vpcs.get(0).getVpcId());
+                }
+
                 amazonEC2.createSecurityGroup(createSecurityGroupRequest);
                 System.out.println("Securitygroup created");
             }
