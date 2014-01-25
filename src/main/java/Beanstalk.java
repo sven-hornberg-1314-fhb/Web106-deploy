@@ -327,7 +327,7 @@ public class Beanstalk {
         List<EnvironmentDescription> environmentDescriptions = awsElasticBeanstalk.describeEnvironments().getEnvironments();
 
         for (EnvironmentDescription environmentDescription : environmentDescriptions) {
-            if (environmentDescription.getVersionLabel().equals(versionLabel)) {
+            if (environmentDescription.getVersionLabel()!= null && environmentDescription.getVersionLabel().equals(versionLabel)) {
                 if (environmentDescription.getHealth().toLowerCase().equals("green")) {
                     url = environmentDescription.getEndpointURL();
                 }
