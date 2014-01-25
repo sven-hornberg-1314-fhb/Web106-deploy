@@ -135,7 +135,7 @@ public class Beanstalk {
             String tempName = appliationName+"env";
             boolean envexists = false;
             for (EnvironmentDescription environmentDescription : environmentDescriptions) {
-                if (tempName.equals(environmentDescription.getEnvironmentName())) {
+                if (tempName.equals(environmentDescription.getEnvironmentName().toLowerCase())) {
                     envexists = true;
 
                     UpdateEnvironmentRequest updateEnvironmentRequest = new UpdateEnvironmentRequest();
