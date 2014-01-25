@@ -131,6 +131,50 @@ public class Beanstalk {
         List<EnvironmentDescription> environmentDescriptions = awsElasticBeanstalk.describeEnvironments().getEnvironments();
         if (environmentDescriptions.size() > 0) {
 
+
+            String tempName = appliationName+"env";
+            boolean envexists = false;
+            for (EnvironmentDescription environmentDescription : environmentDescriptions) {
+                if (tempName.equals(environmentDescription.getEnvironmentName())) {
+                    envexists = true;
+
+                    UpdateEnvironmentRequest updateEnvironmentRequest = new UpdateEnvironmentRequest();
+
+                    updateEnvironmentRequest.setVersionLabel(versionLabel);
+                    updateEnvironmentRequest.setTemplateName(templateName);
+                    updateEnvironmentRequest.setEnvironmentName(tempName);
+
+                    List<ConfigurationOptionSetting> configurationOptionSettings;
+                    if (setting.equals(Deploy.settings.LOWCOST)) {
+                        configurationOptionSettings = createLowcostSettings(awsAccessKey, awsSecretKey, JDBC_CONNECTION_STRING, dbUser, dbUserPassword);
+                    } else {
+                        configurationOptionSettings = createStandardSettings(awsAccessKey, awsSecretKey, JDBC_CONNECTION_STRING, dbUser, dbUserPassword);
+                    }
+                    updateEnvironmentRequest.setOptionSettings(configurationOptionSettings);
+
+                    awsElasticBeanstalk.updateEnvironment(updateEnvironmentRequest);
+                }
+            }
+
+            if(!envexists) {
+                CreateEnvironmentRequest createEnvironmentRequest = new CreateEnvironmentRequest();
+                createEnvironmentRequest.setVersionLabel(versionLabel);
+                createEnvironmentRequest.setTemplateName(templateName);
+                createEnvironmentRequest.setApplicationName(appliationName);
+                createEnvironmentRequest.setCNAMEPrefix(cnamePrefix);
+                createEnvironmentRequest.setEnvironmentName(appliationName + "env");
+
+                List<ConfigurationOptionSetting> configurationOptionSettings;
+                if (setting.equals(Deploy.settings.LOWCOST)) {
+                    configurationOptionSettings = createLowcostSettings(awsAccessKey, awsSecretKey, JDBC_CONNECTION_STRING, dbUser, dbUserPassword);
+                } else {
+                    configurationOptionSettings = createStandardSettings(awsAccessKey, awsSecretKey, JDBC_CONNECTION_STRING, dbUser, dbUserPassword);
+                }
+                createEnvironmentRequest.setOptionSettings(configurationOptionSettings);
+
+                awsElasticBeanstalk.createEnvironment(createEnvironmentRequest);
+            }
+
         } else {
             CreateEnvironmentRequest createEnvironmentRequest = new CreateEnvironmentRequest();
             createEnvironmentRequest.setVersionLabel(versionLabel);
@@ -304,6 +348,7 @@ public class Beanstalk {
                 exists = true;
             }
         }
+
         if(exists) {
 
             TerminateEnvironmentRequest terminateEnvironmentRequest = new TerminateEnvironmentRequest();
