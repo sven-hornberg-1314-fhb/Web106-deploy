@@ -71,7 +71,7 @@ public class Rds {
 
             SecurityGroup web106ec2 = null;
             for (SecurityGroup securityGroup : securityGroups) {
-                if (securityGroup.getGroupName().equals("web106ec2")) {
+                if (securityGroup.getGroupName().equals(securityGroupName)) {
                     web106ec2 = securityGroup;
                 }
             }
