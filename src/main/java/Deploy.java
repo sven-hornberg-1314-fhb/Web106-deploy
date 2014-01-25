@@ -27,6 +27,8 @@ public class Deploy {
     private static String applicationLabel = null;
     private static String applicationTemaplate = null;
 
+    private static boolean vpc = false;
+
 
     public enum settings {LOWCOST, STANDARD}
 
@@ -56,6 +58,7 @@ public class Deploy {
                 }
 
                 try {
+
                     //Start deployment steps
                     if (deploymentIsFine) {
                         deploymentIsFine = common.checkAwsProperties();
@@ -89,9 +92,10 @@ public class Deploy {
                         }
                     }
 
+
                     if (deploymentIsFine) {
                         Security security = new Security(awsCredentials);
-                        deploymentIsFine = security.checkSecurityGroupForMySQL(groupName);
+                        deploymentIsFine = security.checkSecurityGroupForMySQL(groupName, vpc);
                         if (deploymentIsFine) {
                             deploymentIsFine = security.checkMySQLPortOnSecurityGroup(groupName);
                         }
@@ -102,7 +106,7 @@ public class Deploy {
                         if (rds.dbexists(databaseName)) {
                             System.out.println("DB already exists");
                         } else {
-                            deploymentIsFine = rds.createRdsDatabase(databaseName, userName, userPassword, Gb, securityGroupName, setting);
+                            deploymentIsFine = rds.createRdsDatabase(databaseName, userName, userPassword, Gb, securityGroupName, setting, vpc);
                         }
                     }
 
@@ -136,6 +140,7 @@ public class Deploy {
                             }
                         }
                     }
+                    deploymentIsFine=true;
                     common.deleteAwsCredentialsFile();
 
                     if (deploymentIsFine) {
@@ -230,20 +235,22 @@ public class Deploy {
             properties.load(stream);
             stream.close();
 
-            awsAccessKey = properties.getProperty("awsAccessKey");
-            awsSecretKey = properties.getProperty("awsSecretKey");
+            awsAccessKey = properties.getProperty("awsAccessKey").trim();
+            awsSecretKey = properties.getProperty("awsSecretKey").trim();
 
-            bucketName = properties.getProperty("bucketName");
-            fileName = properties.getProperty("fileName");
-            applicationName = properties.getProperty("applicationName");
-            applicationLabel = properties.getProperty("label");
+            bucketName = properties.getProperty("bucketName").trim();
+            fileName = properties.getProperty("fileName").trim();
+            applicationName = properties.getProperty("applicationName").trim();
+            applicationLabel = properties.getProperty("label").trim();
 
-            userName = properties.getProperty("dbUser");
-            userPassword = properties.getProperty("dbUserPassword");
-            databaseName = properties.getProperty("dbName");
+            userName = properties.getProperty("dbUser").trim();
+            userPassword = properties.getProperty("dbUserPassword").trim();
+            databaseName = properties.getProperty("dbName").trim();
 
-            applicationTemaplate = properties.getProperty("templateName");
-            groupName =properties.getProperty("ec2SecurityGroup");
+            applicationTemaplate = properties.getProperty("templateName").trim();
+            groupName =properties.getProperty("ec2SecurityGroup").trim();
+
+            vpc = Boolean.parseBoolean(properties.getProperty("vpc").trim());
 
 
             if(awsAccessKey == null || awsSecretKey == null || bucketName == null
