@@ -93,6 +93,9 @@ public class Rds {
                         .withMultiAZ(false);
                 if(vpc) {
                     createDBInstanceRequest.withVpcSecurityGroupIds(ids);
+                } else {
+                    
+                    createDBInstanceRequest.withDBSecurityGroups(ids);
                 }
 
                 if(setting.equals(Deploy.settings.LOWCOST)) {
