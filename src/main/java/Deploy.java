@@ -13,7 +13,6 @@ public class Deploy {
     private static boolean deploymentIsFine = true;
     private static String fileName = null;
     private static AWSCredentials awsCredentials;
-    private static String groupName = null;
 
     private static String databaseName = null;
     private static String userName = null;
@@ -94,9 +93,9 @@ public class Deploy {
 
                     if (deploymentIsFine) {
                         Security security = new Security(awsCredentials);
-                        deploymentIsFine = security.checkSecurityGroupForMySQL(groupName, vpc);
+                        deploymentIsFine = security.checkSecurityGroupForMySQL(securityGroupName, vpc);
                         if (deploymentIsFine) {
-                            deploymentIsFine = security.checkMySQLPortOnSecurityGroup(groupName);
+                            deploymentIsFine = security.checkMySQLPortOnSecurityGroup(securityGroupName);
                         }
                     }
 
@@ -247,7 +246,7 @@ public class Deploy {
             databaseName = properties.getProperty("dbName").trim();
 
             applicationTemaplate = properties.getProperty("templateName").trim();
-            groupName =properties.getProperty("ec2SecurityGroup").trim();
+            securityGroupName =properties.getProperty("ec2SecurityGroup").trim();
 
             vpc = Boolean.parseBoolean(properties.getProperty("vpc").trim());
 
@@ -255,7 +254,7 @@ public class Deploy {
             if(awsAccessKey == null || awsSecretKey == null || bucketName == null
                     || fileName == null || applicationName == null || applicationLabel == null ||
                     userName == null || userPassword == null || databaseName == null ||
-                    applicationTemaplate == null || groupName == null) {
+                    applicationTemaplate == null || securityGroupName == null) {
                 System.out.println("please check our aws.properties file , some information are missing");
                 returnVal = false;
             }
