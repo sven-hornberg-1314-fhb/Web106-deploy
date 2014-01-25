@@ -1,4 +1,3 @@
-
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import org.joda.time.DateTime;
@@ -140,7 +139,7 @@ public class Deploy {
                             }
                         }
                     }
-                    deploymentIsFine=true;
+                 
                     common.deleteAwsCredentialsFile();
 
                     if (deploymentIsFine) {
