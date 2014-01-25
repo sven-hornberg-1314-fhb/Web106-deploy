@@ -136,23 +136,26 @@ public class Beanstalk {
             boolean envexists = false;
             for (EnvironmentDescription environmentDescription : environmentDescriptions) {
                 if (tempName.equals(environmentDescription.getEnvironmentName().toLowerCase())) {
+
+                    if(!environmentDescription.getStatus().contains("Terminated")){
                     envexists = true;
 
-                    UpdateEnvironmentRequest updateEnvironmentRequest = new UpdateEnvironmentRequest();
+                        UpdateEnvironmentRequest updateEnvironmentRequest = new UpdateEnvironmentRequest();
 
-                    updateEnvironmentRequest.setVersionLabel(versionLabel);
-                    updateEnvironmentRequest.setTemplateName(templateName);
-                    updateEnvironmentRequest.setEnvironmentName(tempName);
+                        updateEnvironmentRequest.setVersionLabel(versionLabel);
+                        updateEnvironmentRequest.setTemplateName(templateName);
+                        updateEnvironmentRequest.setEnvironmentName(tempName);
 
-                    List<ConfigurationOptionSetting> configurationOptionSettings;
-                    if (setting.equals(Deploy.settings.LOWCOST)) {
-                        configurationOptionSettings = createLowcostSettings(awsAccessKey, awsSecretKey, JDBC_CONNECTION_STRING, dbUser, dbUserPassword);
-                    } else {
-                        configurationOptionSettings = createStandardSettings(awsAccessKey, awsSecretKey, JDBC_CONNECTION_STRING, dbUser, dbUserPassword);
+                        List<ConfigurationOptionSetting> configurationOptionSettings;
+                        if (setting.equals(Deploy.settings.LOWCOST)) {
+                            configurationOptionSettings = createLowcostSettings(awsAccessKey, awsSecretKey, JDBC_CONNECTION_STRING, dbUser, dbUserPassword);
+                        } else {
+                            configurationOptionSettings = createStandardSettings(awsAccessKey, awsSecretKey, JDBC_CONNECTION_STRING, dbUser, dbUserPassword);
+                        }
+                        updateEnvironmentRequest.setOptionSettings(configurationOptionSettings);
+
+                        awsElasticBeanstalk.updateEnvironment(updateEnvironmentRequest);
                     }
-                    updateEnvironmentRequest.setOptionSettings(configurationOptionSettings);
-
-                    awsElasticBeanstalk.updateEnvironment(updateEnvironmentRequest);
                 }
             }
 
