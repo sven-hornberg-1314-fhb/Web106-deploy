@@ -5,8 +5,9 @@ Deploy [Web106](https://github.com/sven-hornberg-1314-fhb/Web106) with one singl
 
 ## Instructions
 
+You have the choice between building that project bei your own, or download a generated jar from here [Download](https://github.com/sven-hornberg-1314-fhb/Web106-deploy/raw/master/download/deploy-1.0-jar-with-dependencies.jar)
 
-First checkout this project and compile using following command:
+If you choose to build it yourself first checkout this project and compile using following command:
 
     mvn clean compile assembly:single
 
