@@ -38,7 +38,7 @@ public class Security {
         for (SecurityGroup securityGroup : securityGroups) {
             if (securityGroup.getGroupName().equals(groupName)) {
                 web106ec2 = securityGroup;
-                System.out.println("Securitygroup ok");
+                System.out.println("Securitygroup ok for MySQL");
             }
         }
 
@@ -83,7 +83,7 @@ public class Security {
             for (SecurityGroup securityGroup : securityGroups) {
                 if (securityGroup.getGroupName().equals(groupName)) {
                     web106ec2 = securityGroup;
-                    System.out.println("Securitygroup ok");
+                    System.out.println("Securitygroup ok for Port");
                 }
             }
 
