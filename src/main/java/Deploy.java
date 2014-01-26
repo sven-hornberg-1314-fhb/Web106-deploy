@@ -69,6 +69,9 @@ public class Deploy {
                         }
                     }
 
+                    if (deploymentIsFine) {
+                        deploymentIsFine = common.createAwsCredentialsFile(awsAccessKey, awsSecretKey);
+                    }
 
                     if (deploymentIsFine) {
                         deploymentIsFine = common.checkGrailsWrapper();
@@ -76,11 +79,6 @@ public class Deploy {
                             common.createWarFile(fileName);
                         }
                     }
-
-                    if (deploymentIsFine) {
-                        deploymentIsFine = common.createAwsCredentialsFile(awsAccessKey, awsSecretKey);
-                    }
-
 
                     if (deploymentIsFine) {
                         Beanstalk beanstalk = new Beanstalk(awsCredentials);
