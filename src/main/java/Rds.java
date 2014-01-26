@@ -147,9 +147,9 @@ public class Rds {
 
         } catch (Exception ex) {
 
-            if(ex.getMessage().toLowerCase().contains("DBInstanceAlreadyExists")) {
+            if(ex.getMessage().toLowerCase().contains("dbinstancealreadyexists")) {
                 System.out.println("DBInstance already exists");
-            } else if(ex.getMessage().toLowerCase().contains("GroupNotFound")) {
+            } else if(ex.getMessage().toLowerCase().contains("groupnotfound")) {
                 System.out.println("Group not found");
                 return false;
             } else {
