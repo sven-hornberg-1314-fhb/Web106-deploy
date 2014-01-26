@@ -69,6 +69,8 @@ public class Beanstalk {
                     deleteApplicationVersionRequest.setApplicationName(applicationName);
                     deleteApplicationVersionRequest.setVersionLabel(versionLabel);
                     deleteApplicationVersionRequest.setDeleteSourceBundle(false);
+
+                    awsElasticBeanstalk.deleteApplicationVersion(deleteApplicationVersionRequest);
                 }
             }
         }
@@ -78,6 +80,8 @@ public class Beanstalk {
         S3Location s3Location = new S3Location();
         s3Location.setS3Bucket(bucketName);
         s3Location.setS3Key(bucketKey);
+
+
 
         CreateApplicationVersionRequest createApplicationVersionRequest = new CreateApplicationVersionRequest();
         createApplicationVersionRequest.withApplicationName(applicationName)

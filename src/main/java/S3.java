@@ -1,12 +1,15 @@
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.regions.*;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.Region;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import com.amazonaws.regions.Regions;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +30,9 @@ public class S3 {
     public boolean checkAndCreateBucket(String bucketName) {
 
         AmazonS3 s3client = new AmazonS3Client(awsCredentials);
+        com.amazonaws.regions.Region region = com.amazonaws.regions.Region.getRegion(Regions.EU_WEST_1);
+        s3client.setRegion(region);
+
         if (s3client.doesBucketExist(bucketName)) {
 
             List<Bucket> bucketList = s3client.listBuckets();
@@ -51,12 +57,15 @@ public class S3 {
     }
 
     public boolean uploadWarfile(String bucketName, File file) {
+        com.amazonaws.regions.Region region = com.amazonaws.regions.Region.getRegion(Regions.EU_WEST_1);
 
         try {
 
             System.out.println("begin upload");
             AmazonS3 s3client = new AmazonS3Client(awsCredentials);
+            s3client.setRegion(region);
             TransferManager tx = new TransferManager(s3client);
+
 
             String keyName = file.getName();
 
@@ -80,6 +89,9 @@ public class S3 {
 
         AmazonS3 s3client = new AmazonS3Client(awsCredentials);
         TransferManager tx = new TransferManager(s3client);
+        com.amazonaws.regions.Region region = com.amazonaws.regions.Region.getRegion(Regions.EU_WEST_1);
+        s3client.setRegion(region);
+
         String MD5 = null;
 
         ObjectListing objectListing = tx.getAmazonS3Client().listObjects(
@@ -104,6 +116,7 @@ public class S3 {
             md5 = DigestUtils.md5Hex(IOUtils.toByteArray(fis));
 
         } catch (FileNotFoundException e) {
+            System.out.print("local file not found");
         } catch (IOException e) {
             String test = e.getMessage();
         }
