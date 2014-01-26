@@ -35,7 +35,7 @@ terminate all
 
     java -jar deploy-1.0-jar-with-dependencies.jar -terminate
 
-## Requirement to use deploying jar
+## Requirement to use and deploy jar
 
 * Java 1.7 with working classpath
 * Maven with working classpath
