@@ -10,7 +10,15 @@ import java.util.Properties;
 public class Common {
 
     public boolean deleteAwsCredentialsFile() {
-        File file = new File("AwsCredentials.properties");
+        String fileName = "AwsCredentials.properties";
+
+        String separator = System.getProperty("line.separator");
+
+        String sep = System.getProperty("file.separator");
+        String newfileName = "web-app"+sep+"WEB-INF" +sep+ fileName;
+
+
+        File file = new File(newfileName);
         if (file.exists()) {
             file.delete();
         }
