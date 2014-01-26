@@ -174,7 +174,7 @@ public class Deploy {
                         }
 
                         System.out.println("Application ist fully deployed under : ");
-                        System.out.println(beanstalk.ApplicationUrl(applicationLabel));
+                        System.out.println("http://"+applicationName+".elasticbeanstalk.com");
 
                     }
 
@@ -207,7 +207,7 @@ public class Deploy {
                         Rds rds = new Rds(awsCredentials);
                         rds.deleteRds(databaseName);
 
-                        System.out.println("Done");
+                        System.out.println("triggering terminate done, this may take some time");
                     }
                     } catch (Exception ex) {
 
