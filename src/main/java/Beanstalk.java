@@ -62,27 +62,30 @@ public class Beanstalk {
 
             for (ApplicationVersionDescription avd : applicationVersionDescriptions) {
                 if (avd.getVersionLabel().equals(versionLabel)) {
-                    alreadyExists = true;
+
+                    System.out.println("applicationversion already exists, replace it with new one");
+
+                    DeleteApplicationVersionRequest deleteApplicationVersionRequest = new DeleteApplicationVersionRequest();
+                    deleteApplicationVersionRequest.setApplicationName(applicationName);
+                    deleteApplicationVersionRequest.setVersionLabel(versionLabel);
+                    deleteApplicationVersionRequest.setDeleteSourceBundle(false);
                 }
             }
         }
 
-        if (alreadyExists) {
-            System.out.println("applicationversion already exists");
-        } else {
 
-            S3Location s3Location = new S3Location();
-            s3Location.setS3Bucket(bucketName);
-            s3Location.setS3Key(bucketKey);
 
-            CreateApplicationVersionRequest createApplicationVersionRequest = new CreateApplicationVersionRequest();
-            createApplicationVersionRequest.withApplicationName(applicationName)
-                    .withAutoCreateApplication(autoCreateApplication).withVersionLabel(versionLabel).withSourceBundle(s3Location);
+        S3Location s3Location = new S3Location();
+        s3Location.setS3Bucket(bucketName);
+        s3Location.setS3Key(bucketKey);
 
-            awsElasticBeanstalk.createApplicationVersion(createApplicationVersionRequest);
+        CreateApplicationVersionRequest createApplicationVersionRequest = new CreateApplicationVersionRequest();
+        createApplicationVersionRequest.withApplicationName(applicationName)
+                .withAutoCreateApplication(autoCreateApplication).withVersionLabel(versionLabel).withSourceBundle(s3Location);
 
-            System.out.println("created Applicationversion");
-        }
+        awsElasticBeanstalk.createApplicationVersion(createApplicationVersionRequest);
+
+        System.out.println("created Applicationversion");
         return true;
     }
 
