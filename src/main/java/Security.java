@@ -46,7 +46,7 @@ public class Security {
 
             DescribeVpcsResult describeVpcsResult = amazonEC2.describeVpcs();
             List<Vpc> vpcs = describeVpcsResult.getVpcs();
-            if (vpcs.size() == 0 || vpc) {
+            if (vpcs.size() == 0 && vpc) {
                 System.out.println("Please set at least one VPC before deploying");
                 return false;
             } else {
