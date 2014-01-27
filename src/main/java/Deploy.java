@@ -171,7 +171,7 @@ public class Deploy {
                             }
                         }
 
-                        System.out.println("Application ist fully deployed under : ");
+                        System.out.println("Application ist fully deployed under (cname refresh may take some time) : ");
                         System.out.println("http://"+applicationName+".elasticbeanstalk.com");
 
                     }
